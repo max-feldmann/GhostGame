@@ -2,10 +2,11 @@ require 'set'
 require_relative "player"
 
 class Game
-    ALPHABET = Set.new ("a".."z")
+    # ALPHABET = Set.new ("a".."z")
 
     def initialize(*players)
         words = File.readlines("dictionary.txt").map(&:chomp)
+        @alphabet = "abcdefghijklmnopqrstuvxyz"
         @dictionary = ["abc", "bac", "cba"] #Set.new(words)
         @players = []
             players.each{|player_name| @players << Player.new(player_name)}
@@ -13,17 +14,18 @@ class Game
         @current_player = @players.first
     end
 
-    attr_accessor :dictionary, :players, :fragment, :current_player
+    attr_reader :dictionary, :players, :fragment, :current_player, :alphabet
 
     def get_guess
-        guessed_letter = players.first.guess
+        # guessed_letter = @current_player.guess
+        @current_player.guess
     end
 
     def take_turn
         game_over = false
 
         until game_over
-            guessed_letter = @current_player.guess
+            guessed_letter = get_guess
             
             if valid_play?(guessed_letter)
                 add_letter(guessed_letter)
@@ -39,17 +41,17 @@ class Game
     end
 
     def next_player!
-        @players.rotate!
+        @current_player = @players.rotate!.first
     end
 
     def valid_play?(letter) 
-        return false unless ALPHABET.include?(letter.downcase)              # return false, if alphabet does not include the letter. downcased, because alphabet-set is completely lowercase.
+        return false unless @alphabet.include?(letter.downcase)              # return false, if alphabet does not include the letter. downcased, because alphabet-set is completely lowercase.
 
         potential_fragment = @fragment + letter
-        has_beginning?(potential_fragment)
+        does_beginning_exist?(potential_fragment)
     end
 
-    def has_beginning?(fragment)
+    def does_beginning_exist?(fragment)
         @dictionary.any? {|word| word.start_with?(fragment)}                # goes through dictionary and checks every word. if any word starts_with? the potential fragment returns true. if not false
     end
 
