@@ -18,35 +18,64 @@ class Game
     attr_reader :dictionary, :players, :fragment, :current_player, :alphabet, :loosers
 
     def take_turn
-        game_over = false
+        
+        until we_got_a_winner
+            guess = get_guess
+            add_letter(guess)
+            self.next_player!
 
-        while !game_over
-            player_out = false
-            make_move
-
-            if @remaining_players == 1
-                puts "That´s it, #{previous_player.name} has won the game!"
-                game_over = true
+            if fragment_is_word(@fragment)
+                p "#{@fragment} is an actual word! You are out of the game!"
+                @fragment = ""
+                kick_player
+                @remaining_players -= 1
             end
+
+            if we_got_a_winner
+                puts "\nWe have a Winner! #{current_player.name} has won!"
+            end
+
         end
     end
 
-    def make_move
-        self.next_player! if add_letter(get_guess)
-        kick_player?
+    def we_got_a_winner
+        @remaining_players == 1
     end
 
-    def kick_player?
-        player_out = true if is_fragment_word?(@fragment)
-                    
-        if player_out
-            p "#{@fragment} is an actual word! #{previous_player.name} is out of the game!"
+    def kick_player
             @loosers[previous_player.name] = true
-            @fragment = ""
-            @remaining_players -= 1
+    end
+    
+    def get_guess
+        guess = @current_player.guess
+        if valid_play?(guess)
+            return guess
+        else
+            puts "This was not a valid guess. Has to be exactly one alphabetic letter!"
+            get_guess
         end
     end
 
+    # CHECKING AND WORKING WITH USER INPUT (GUESSES)
+    def valid_play?(letter) 
+        return false unless @alphabet.include?(letter.downcase)              # return false, if alphabet does not include the letter. downcased, because alphabet-set is completely lowercase.
+
+        potential_fragment = @fragment + letter
+        does_beginning_exist?(potential_fragment)
+    end
+
+    def does_beginning_exist?(fragment)
+        @dictionary.any? {|word| word.start_with?(fragment)}                # goes through dictionary and checks every word. if any word starts_with? the potential fragment returns true. if not false
+    end
+
+    def add_letter(guessed_letter)
+            @fragment = @fragment + guessed_letter
+    end
+
+    def fragment_is_word(fragment)
+        @dictionary.include?(fragment)
+    end
+    
     # HANDLING THE PLAYERS
     def add_players(array_of_players)
         array_of_players.each do |player| 
@@ -68,34 +97,5 @@ class Game
     def next_player!
         @current_player = @players.rotate!.first
             next_player! if @loosers[@current_player.name] == true
-    end
-    
-    def get_guess
-        # guessed_letter = @current_player.guess
-        @current_player.guess
-    end
-
-    # CHECKING AND WORKING WITH USER INPUT (GUESSES)
-    def valid_play?(letter) 
-        return false unless @alphabet.include?(letter.downcase)              # return false, if alphabet does not include the letter. downcased, because alphabet-set is completely lowercase.
-
-        potential_fragment = @fragment + letter
-        does_beginning_exist?(potential_fragment)
-    end
-
-    def does_beginning_exist?(fragment)
-        @dictionary.any? {|word| word.start_with?(fragment)}                # goes through dictionary and checks every word. if any word starts_with? the potential fragment returns true. if not false
-    end
-
-    def add_letter(guessed_letter)
-        if valid_play?(guessed_letter)
-            @fragment = @fragment + guessed_letter
-        else
-            p "This was not a valid move, #{@current_player}? Try again."
-        end
-    end
-
-    def is_fragment_word?(fragment)
-        @dictionary.include?(fragment)
     end
 end
