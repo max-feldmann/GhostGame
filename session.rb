@@ -19,6 +19,8 @@ class Session
         @session.add_players(players)
         @session.set_current_player
         @session.take_turn
+
+        puts "\n \n Thank´s alot for swinging by! See you next time ;)"
     end
 
     def get_player_names

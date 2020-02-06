@@ -1,4 +1,3 @@
-
 class Player
 
     def initialize(name)
@@ -8,8 +7,8 @@ class Player
     attr_reader :name, :guess
 
     def guess
-        p "Hey #{self.name} make a guess! (Has to be a single letter ;))"
-        guess = gets.chomp.downcase
+            p "Hey #{self.name} make a guess! (Has to be a single letter ;))"
+            guess = gets.chomp.downcase
         guess
     end
 end
