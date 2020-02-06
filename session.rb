@@ -8,18 +8,23 @@ class Session
         @this_session = nil
     end
 
-    def run
+    def boot_game
+        players = []
+
         until @players_joined == @number_of_players
-            session = Game.new(get_player_name)
+            players << self.get_player_names
         end
 
-        session.take_turn
+        @session = Game.new
+        @session.add_players(players)
+        @session.set_current_player
+        @session.take_turn
     end
 
-    def get_player_name
+    def get_player_names
           @players_joined += 1
-            p "Player #{@players_joined}, what is your name?"
-            player_name = gets.chomp
+            puts "\nPlayer #{@players_joined}, what is your name?\n"
+            player_name = gets.chomp.to_s
         
         player_name
     end
@@ -27,11 +32,11 @@ class Session
     # UI METHODS
 
     def greeting
-        puts "\nWelcome to a game of GHOST!
+        puts "\nWelcome to a game of > GHOST < !!!
         \nLet´s start!
         \nHow many players are you?"
         num_players = gets.chomp.to_i
     end
 end
 
-Session.new.run
+Session.new.boot_game

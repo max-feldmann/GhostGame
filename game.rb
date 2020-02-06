@@ -4,14 +4,14 @@ require_relative "player"
 class Game
     # ALPHABET = Set.new ("a".."z")
 
-    def initialize(*players)
+    def initialize()
         words = File.readlines("dictionary.txt").map(&:chomp)
         @alphabet = "abcdefghijklmnopqrstuvxyz"
-        @dictionary = ["abc", "bac", "cba"] #Set.new(words)
+        @dictionary = Set.new(words)
+        # @dictionary = ["abc", "bac", "cba"]    # Just for testing in Pry. (Loads forever if set alphabet is loaded)
         @players = []
-            players.each{|player_name| @players << Player.new(player_name)}
         @fragment = ""
-        @current_player = @players.first
+        @current_player = nil
     end
 
     attr_reader :dictionary, :players, :fragment, :current_player, :alphabet
@@ -26,10 +26,10 @@ class Game
                 add_letter(guessed_letter)
                 self.next_player!
             else
-                p "This was not a valid move, bro? Try again."
+                p "This was not a valid move, #{@current_player}? Try again."
             end
 
-            game_over = true if is_fragment_word?(@fragment)
+                game_over = true if is_fragment_word?(@fragment)
 
                 if game_over
                     p "#{@fragment} is an actual word! #{previous_player.name} has lost the game!"
@@ -38,6 +38,14 @@ class Game
     end
 
     # HANDLING THE PLAYERS
+    def add_players(array_of_players)
+        array_of_players.each{|player| @players << Player.new(player)}
+    end
+    
+    def set_current_player
+        @current_player = @players.first
+    end
+
     def previous_player
         @players[-1]
     end
@@ -70,5 +78,4 @@ class Game
     def is_fragment_word?(fragment)
         @dictionary.include?(fragment)
     end
-
 end
