@@ -12,7 +12,8 @@ class Session
         @session = Game.new
         @session.add_players(players)
         @session.set_current_player
-        @session.take_turn
+        @session.play_game
+
         restart_game?(players)      # if game is over, next restart is called, which - if affirmative - calls start_session again
     end
 

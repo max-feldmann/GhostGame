@@ -4,7 +4,7 @@ class Player
         @name = name
     end
 
-    attr_reader :name, :guess
+    attr_reader :name, :guess, :wins
 
     # Simply asks player for a guess and returns the answer
     def guess

@@ -12,24 +12,49 @@ class Game
         @fragment = ""
         @current_player = nil
         @loosers = {}
+        @winners = Hash.new{0}
         @remaining_players = 0
+        @wins_needed = 2
     end
 
     attr_reader :dictionary, :players, :fragment, :current_player, :alphabet, :loosers
 
+    def play_game
+        until game_over
+            play_round
+            reset_game
+        end
+    end
+   
     # Until we got a winner (1 remaining player), a guess is received(get_guess checks for validity, so only correct guesses arrive here)
     # guess is then added to the fragment and next player is activated
     # Add letter checks if the fragment is now a word, that is in the dictionary. if it is, the active player is kicked.
     # if we got a winner after that guess, the game ends.
-    def take_turn
+   
+    def play_round
         until we_got_a_winner
             add_letter(get_guess)
             self.next_player!
 
             if we_got_a_winner
-                puts "\nWe have a Winner! #{current_player.name} has won!"
+                puts "\n#{current_player.name} has won this round!"
+                @winners[@current_player] += 1
             end
         end
+    end
+
+    def reset_game
+        add_players(@players)
+        @fragment = ""
+    end
+
+    def game_over
+        @winners.each do |player, wins|
+            if wins == @wins_needed
+                return true
+            end
+        end
+        false
     end
 
     # If remaining players is down to 1, the last player has to be the winner
